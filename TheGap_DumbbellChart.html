@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Gap — Spanking & Child Aggression Across 60 Countries</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.27.0/plotly.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+3:wght@300;400;600&family=Source+Code+Pro:wght@400;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue:      #00274C;
+    --maize:     #FFCB05;
+    --teal:      #00B2A9;
+    --red:       #9A3324;
+    --arboretum: #2F65A7;
+    --stone:     #655A52;
+    --ash:       #989C97;
+    --bg:        #F7F5F1;
+    --bg2:       #EDEAE4;
+    --border:    #D8D3CC;
+    --orange:    #D86018;
+  }
+
+  html, body {
+    background: var(--bg);
+    font-family: 'Source Sans 3', sans-serif;
+    color: var(--blue);
+    min-height: 100vh;
+  }
+
+  /* ── TOP BAR ── */
+  .top-bar {
+    background: var(--blue);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 44px;
+    border-bottom: 3px solid var(--maize);
+  }
+  .top-bar-label {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--teal);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .top-bar-right {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 10px;
+    color: rgba(255,203,5,0.6);
+    letter-spacing: 0.06em;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: var(--blue);
+    padding: 40px 24px 32px;
+  }
+  .hero-concept {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--teal);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(22px, 4vw, 36px);
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 10px;
+    max-width: 600px;
+  }
+  .hero-title span { color: var(--maize); }
+  .hero-sub {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 14px;
+    color: rgba(255,255,255,0.6);
+    max-width: 520px;
+    line-height: 1.6;
+    margin-bottom: 28px;
+  }
+
+  /* ── STAT CARDS ── */
+  .stat-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .stat-card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 14px 18px;
+    min-width: 110px;
+  }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-lbl {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 10px;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* ── CONTROLS ── */
+  .controls {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .control-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .control-label {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--ash);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .chip-set { display: flex; gap: 4px; flex-wrap: wrap; }
+  .chip {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    color: var(--stone);
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+  .chip:hover { border-color: var(--blue); color: var(--blue); }
+  .chip.active { background: var(--blue); color: var(--maize); border-color: var(--blue); }
+
+  .sort-select {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 1.5px solid var(--border);
+    color: var(--stone);
+    background: var(--bg);
+    cursor: pointer;
+  }
+
+  /* ── LEGEND ── */
+  .legend-bar {
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+  }
+  .leg-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 12px;
+    color: var(--stone);
+    font-weight: 600;
+  }
+  .leg-dot {
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
+    flex-shrink: 0;
+  }
+  .leg-line {
+    width: 22px; height: 3px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .legend-note {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 10px;
+    color: var(--ash);
+    margin-left: auto;
+  }
+
+  /* ── CHART WRAPPER ── */
+  .chart-section {
+    padding: 16px 24px 8px;
+  }
+  #chart {
+    width: 100%;
+  }
+
+  /* ── DETAIL PANEL ── */
+  .detail-panel {
+    display: none;
+    background: var(--blue);
+    border-top: 3px solid var(--maize);
+    padding: 20px 24px;
+    animation: slideUp 0.22s ease-out;
+  }
+  .detail-panel.visible { display: block; }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 18px;
+  }
+  .detail-country {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .detail-close {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 12px;
+    color: rgba(255,203,5,0.7);
+    cursor: pointer;
+    padding: 4px 10px;
+    border: 1px solid rgba(255,203,5,0.3);
+    border-radius: 4px;
+    background: transparent;
+    transition: all 0.15s;
+  }
+  .detail-close:hover { background: rgba(255,203,5,0.1); }
+  .detail-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .detail-card {
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .dc-no-spank  { background: rgba(0,178,169,0.15); border: 1.5px solid var(--teal); }
+  .dc-spanked   { background: rgba(154,51,36,0.2);  border: 1.5px solid var(--red); }
+  .dc-no-explain{ background: rgba(47,101,167,0.15);border: 1.5px solid var(--arboretum); }
+  .dc-explained { background: rgba(216,96,24,0.15); border: 1.5px solid var(--orange); }
+  .dc-lbl {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .dc-lbl.teal  { color: var(--teal); }
+  .dc-lbl.red   { color: #E07060; }
+  .dc-lbl.blue  { color: #6A9FD4; }
+  .dc-lbl.orange{ color: #E8A060; }
+  .dc-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+  }
+  .dc-sub {
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 10px;
+    color: rgba(255,255,255,0.45);
+    margin-top: 4px;
+  }
+  .dc-gap {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 5px;
+  }
+  .dc-gap.pos { color: #E07060; }
+  .dc-gap.neg { color: var(--teal); }
+  .detail-insight {
+    background: rgba(255,203,5,0.1);
+    border: 1px solid rgba(255,203,5,0.25);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 12px;
+    color: rgba(255,255,255,0.8);
+    line-height: 1.5;
+  }
+  .detail-insight strong { color: var(--maize); }
+
+  /* ── SOURCE ── */
+  .source-bar {
+    padding: 10px 24px;
+    border-top: 1px solid var(--border);
+    margin-top: 4px;
+  }
+  .source-text {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 9.5px;
+    color: var(--ash);
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <span class="top-bar-label">Global Families Project · U-M School of Social Work</span>
+  <span class="top-bar-right">Grogan-Kaylor & Ward 2024 · UNICEF MICS</span>
+</div>
+
+<div class="hero">
+  <div class="hero-concept">The Gap — Dumbbell Slope Chart</div>
+  <h1 class="hero-title">Spanking raises child aggression<br><span>in nearly every country</span></h1>
+  <p class="hero-sub">Predicted probabilities from 229,465 caregivers across 60 low- and middle-income countries. Each row shows one country: not spanked vs. spanked, and not explained vs. explained.</p>
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--red);">68.8%</div>
+      <div class="stat-lbl">Highest (Eswatini)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--teal);">5.2%</div>
+      <div class="stat-lbl">Lowest (Turkmenistan)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--maize);">60</div>
+      <div class="stat-lbl">Countries</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" style="color:var(--maize);">+10pp</div>
+      <div class="stat-lbl">Median spank gap</div>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <div class="control-group">
+    <span class="control-label">Sort by</span>
+    <select class="sort-select" id="sortSelect" onchange="applyFilters()">
+      <option value="spank_gap">Spanking gap (desc)</option>
+      <option value="no_spank">Baseline aggression</option>
+      <option value="country">Country name</option>
+    </select>
+  </div>
+  <div class="control-group">
+    <span class="control-label">View</span>
+    <div class="chip-set" id="viewChips">
+      <div class="chip active" onclick="setView('both',this)">Both disciplines</div>
+      <div class="chip" onclick="setView('spank',this)">Spanking only</div>
+      <div class="chip" onclick="setView('explain',this)">Explaining only</div>
+    </div>
+  </div>
+</div>
+
+<div class="legend-bar">
+  <div class="leg-item">
+    <div class="leg-dot" style="background:var(--teal);"></div>
+    Not spanked
+  </div>
+  <div class="leg-item">
+    <div class="leg-dot" style="background:var(--red);"></div>
+    Spanked
+  </div>
+  <div class="leg-item" id="leg-explain-items" style="display:flex;gap:24px;">
+    <div class="leg-item">
+      <div class="leg-dot" style="background:var(--arboretum);border:2px dashed rgba(255,255,255,0.6);"></div>
+      Not explained
+    </div>
+    <div class="leg-item">
+      <div class="leg-dot" style="background:var(--orange);border:2px dashed rgba(255,255,255,0.6);"></div>
+      Explained
+    </div>
+  </div>
+  <span class="legend-note">Tap / click any row to expand detail</span>
+</div>
+
+<div class="chart-section">
+  <div id="chart"></div>
+</div>
+
+<div class="detail-panel" id="detailPanel">
+  <div class="detail-header">
+    <div class="detail-country" id="detailCountry"></div>
+    <button class="detail-close" onclick="closeDetail()">✕ Close</button>
+  </div>
+  <div class="detail-cards" id="detailCards"></div>
+  <div class="detail-insight" id="detailInsight"></div>
+</div>
+
+<div class="source-bar">
+  <span class="source-text">
+    Source: Grogan-Kaylor & Ward (2024) · UNICEF Multiple Indicator Cluster Surveys (MICS) Rounds 4–5 · n = 229,465 · 60 low- and middle-income countries · Bayesian multilevel logistic regression · Predicted probabilities of child aggressive behavior
+  </span>
+</div>
+
+<script>
+const RAW = [{"country":"Montenegro","no_spank":0.2561,"spanked":0.2158,"no_explain":0.3034,"explained":0.2285,"spank_gap":-0.0403,"explain_gap":-0.0749},{"country":"Turkmenistan","no_spank":0.0517,"spanked":0.0561,"no_explain":0.0671,"explained":0.0509,"spank_gap":0.0043,"explain_gap":-0.0162},{"country":"Bosnia And Herzegovina","no_spank":0.1351,"spanked":0.1646,"no_explain":0.1523,"explained":0.1439,"spank_gap":0.0295,"explain_gap":-0.0084},{"country":"Lebanon Palestinians","no_spank":0.3209,"spanked":0.3554,"no_explain":0.3322,"explained":0.3337,"spank_gap":0.0345,"explain_gap":0.0015},{"country":"Cameroon","no_spank":0.5219,"spanked":0.5578,"no_explain":0.5143,"explained":0.5458,"spank_gap":0.0359,"explain_gap":0.0316},{"country":"Belize","no_spank":0.2427,"spanked":0.2795,"no_explain":0.2486,"explained":0.2556,"spank_gap":0.0368,"explain_gap":0.007},{"country":"Algeria","no_spank":0.2893,"spanked":0.3262,"no_explain":0.2958,"explained":0.3085,"spank_gap":0.0369,"explain_gap":0.0127},{"country":"Iraq","no_spank":0.2426,"spanked":0.281,"no_explain":0.2469,"explained":0.2573,"spank_gap":0.0384,"explain_gap":0.0104},{"country":"Barbados","no_spank":0.2813,"spanked":0.3211,"no_explain":0.2836,"explained":0.2982,"spank_gap":0.0398,"explain_gap":0.0146},{"country":"Guinea Bissau","no_spank":0.4725,"spanked":0.5136,"no_explain":0.5282,"explained":0.4713,"spank_gap":0.0411,"explain_gap":-0.057},{"country":"Togo","no_spank":0.3956,"spanked":0.4388,"no_explain":0.3949,"explained":0.4197,"spank_gap":0.0432,"explain_gap":0.0247},{"country":"Jamaica","no_spank":0.3306,"spanked":0.3741,"no_explain":0.3159,"explained":0.3571,"spank_gap":0.0436,"explain_gap":0.0412},{"country":"Paraguay","no_spank":0.167,"spanked":0.2137,"no_explain":0.1849,"explained":0.1782,"spank_gap":0.0467,"explain_gap":-0.0067},{"country":"Vietnam","no_spank":0.1675,"spanked":0.2191,"no_explain":0.2038,"explained":0.186,"spank_gap":0.0516,"explain_gap":-0.0178},{"country":"Kyrgyzstan","no_spank":0.1523,"spanked":0.2042,"no_explain":0.1753,"explained":0.1655,"spank_gap":0.0519,"explain_gap":-0.0098},{"country":"Trinidad And Tobago","no_spank":0.2346,"spanked":0.2881,"no_explain":0.2326,"explained":0.2537,"spank_gap":0.0535,"explain_gap":0.0211},{"country":"Chad","no_spank":0.3256,"spanked":0.3793,"no_explain":0.3663,"explained":0.3493,"spank_gap":0.0537,"explain_gap":-0.0171},{"country":"Pakistan","no_spank":0.491,"spanked":0.5488,"no_explain":0.5245,"explained":0.5056,"spank_gap":0.0578,"explain_gap":-0.0189},{"country":"Suriname","no_spank":0.4631,"spanked":0.5263,"no_explain":0.4923,"explained":0.4907,"spank_gap":0.0631,"explain_gap":-0.0016},{"country":"Argentina","no_spank":0.1897,"spanked":0.2546,"no_explain":0.191,"explained":0.211,"spank_gap":0.0649,"explain_gap":0.02},{"country":"Ukraine","no_spank":0.1665,"spanked":0.2325,"no_explain":0.1755,"explained":0.1848,"spank_gap":0.066,"explain_gap":0.0093},{"country":"El Salvador","no_spank":0.2237,"spanked":0.2904,"no_explain":0.2122,"explained":0.2524,"spank_gap":0.0667,"explain_gap":0.0402},{"country":"Cote D Ivoire","no_spank":0.3968,"spanked":0.4666,"no_explain":0.4026,"explained":0.4385,"spank_gap":0.0699,"explain_gap":0.0359},{"country":"Mexico","no_spank":0.2403,"spanked":0.3109,"no_explain":0.2767,"explained":0.2643,"spank_gap":0.0705,"explain_gap":-0.0123},{"country":"Sierra Leone","no_spank":0.4973,"spanked":0.568,"no_explain":0.5126,"explained":0.5212,"spank_gap":0.0707,"explain_gap":0.0086},{"country":"Eswatini","no_spank":0.6174,"spanked":0.6883,"no_explain":0.6003,"explained":0.6407,"spank_gap":0.0708,"explain_gap":0.0405},{"country":"Benin","no_spank":0.3296,"spanked":0.4047,"no_explain":0.3734,"explained":0.3689,"spank_gap":0.075,"explain_gap":-0.0045},{"country":"Sao Tome And Principe","no_spank":0.5212,"spanked":0.5963,"no_explain":0.5482,"explained":0.5759,"spank_gap":0.0752,"explain_gap":0.0277},{"country":"Kenya","no_spank":0.4076,"spanked":0.4871,"no_explain":0.375,"explained":0.4426,"spank_gap":0.0796,"explain_gap":0.0676},{"country":"St Lucia","no_spank":0.2418,"spanked":0.3226,"no_explain":0.265,"explained":0.2628,"spank_gap":0.0808,"explain_gap":-0.0023},{"country":"Moldova","no_spank":0.2282,"spanked":0.31,"no_explain":0.2773,"explained":0.2563,"spank_gap":0.0818,"explain_gap":-0.021},{"country":"Nigeria","no_spank":0.4165,"spanked":0.4984,"no_explain":0.4217,"explained":0.4651,"spank_gap":0.082,"explain_gap":0.0434},{"country":"Serbia","no_spank":0.1452,"spanked":0.2279,"no_explain":0.1715,"explained":0.1767,"spank_gap":0.0828,"explain_gap":0.0052},{"country":"Congo Dr","no_spank":0.5372,"spanked":0.6206,"no_explain":0.5455,"explained":0.5989,"spank_gap":0.0833,"explain_gap":0.0534},{"country":"Guyana","no_spank":0.3165,"spanked":0.4002,"no_explain":0.3198,"explained":0.3519,"spank_gap":0.0837,"explain_gap":0.0321},{"country":"Nepal","no_spank":0.3356,"spanked":0.4197,"no_explain":0.3696,"explained":0.3613,"spank_gap":0.0841,"explain_gap":-0.0082},{"country":"Costa Rica","no_spank":0.2856,"spanked":0.3699,"no_explain":0.2985,"explained":0.3046,"spank_gap":0.0843,"explain_gap":0.006},{"country":"Somalia","no_spank":0.4815,"spanked":0.569,"no_explain":0.5098,"explained":0.5208,"spank_gap":0.0875,"explain_gap":0.0111},{"country":"Dominican Republic","no_spank":0.2811,"spanked":0.3698,"no_explain":0.2851,"explained":0.3196,"spank_gap":0.0887,"explain_gap":0.0345},{"country":"Mali","no_spank":0.2597,"spanked":0.3493,"no_explain":0.28,"explained":0.2974,"spank_gap":0.0896,"explain_gap":0.0174},{"country":"Zimbabwe","no_spank":0.4212,"spanked":0.5126,"no_explain":0.3818,"explained":0.4461,"spank_gap":0.0914,"explain_gap":0.0643},{"country":"Uruguay","no_spank":0.2064,"spanked":0.3001,"no_explain":0.2377,"explained":0.222,"spank_gap":0.0937,"explain_gap":-0.0157},{"country":"Kazakhstan","no_spank":0.1523,"spanked":0.2463,"no_explain":0.1513,"explained":0.1763,"spank_gap":0.094,"explain_gap":0.0251},{"country":"Ghana","no_spank":0.4816,"spanked":0.5767,"no_explain":0.5226,"explained":0.5257,"spank_gap":0.0951,"explain_gap":0.003},{"country":"Kosovo","no_spank":0.2702,"spanked":0.3676,"no_explain":0.2911,"explained":0.2867,"spank_gap":0.0974,"explain_gap":-0.0045},{"country":"Lao","no_spank":0.2407,"spanked":0.3402,"no_explain":0.316,"explained":0.2568,"spank_gap":0.0995,"explain_gap":-0.0592},{"country":"Tunisia","no_spank":0.4477,"spanked":0.5481,"no_explain":0.4898,"explained":0.5034,"spank_gap":0.1004,"explain_gap":0.0136},{"country":"Mongolia","no_spank":0.2725,"spanked":0.3743,"no_explain":0.2834,"explained":0.2919,"spank_gap":0.1018,"explain_gap":0.0085},{"country":"Mauritania","no_spank":0.4716,"spanked":0.5746,"no_explain":0.4329,"explained":0.548,"spank_gap":0.103,"explain_gap":0.1151},{"country":"Congo R","no_spank":0.515,"spanked":0.6195,"no_explain":0.5234,"explained":0.5875,"spank_gap":0.1045,"explain_gap":0.0641},{"country":"Madagascar South","no_spank":0.3581,"spanked":0.4648,"no_explain":0.3663,"explained":0.4133,"spank_gap":0.1066,"explain_gap":0.047},{"country":"State Of Palestine","no_spank":0.3109,"spanked":0.4208,"no_explain":0.358,"explained":0.3659,"spank_gap":0.1099,"explain_gap":0.0079},{"country":"Malawi","no_spank":0.4092,"spanked":0.5211,"no_explain":0.3901,"explained":0.4467,"spank_gap":0.1119,"explain_gap":0.0565},{"country":"Thailand","no_spank":0.2331,"spanked":0.3464,"no_explain":0.2304,"explained":0.2919,"spank_gap":0.1133,"explain_gap":0.0615},{"country":"Guinea","no_spank":0.388,"spanked":0.5068,"no_explain":0.4299,"explained":0.4643,"spank_gap":0.1188,"explain_gap":0.0344},{"country":"Panama","no_spank":0.2708,"spanked":0.395,"no_explain":0.2499,"explained":0.3155,"spank_gap":0.1241,"explain_gap":0.0655},{"country":"Bangladesh","no_spank":0.2679,"spanked":0.3972,"no_explain":0.2721,"explained":0.3429,"spank_gap":0.1293,"explain_gap":0.0709},{"country":"Macedonia","no_spank":0.2463,"spanked":0.3797,"no_explain":0.3065,"explained":0.305,"spank_gap":0.1335,"explain_gap":-0.0015},{"country":"Senegal Dakar","no_spank":0.374,"spanked":0.5087,"no_explain":0.3742,"explained":0.4625,"spank_gap":0.1348,"explain_gap":0.0883},{"country":"The Gambia","no_spank":0.5317,"spanked":0.6816,"no_explain":0.4539,"explained":0.6239,"spank_gap":0.1499,"explain_gap":0.17}];
+
+// Filter out Total row if present
+const DATA = RAW.filter(d => d.country && d.country !== 'Total');
+
+let currentView = 'both';
+let currentSort = 'spank_gap';
+
+function pct(v) { return (v * 100).toFixed(1) + '%'; }
+function gap(v)  { return (v >= 0 ? '+' : '') + (v * 100).toFixed(1) + 'pp'; }
+
+function getSorted(data, sort) {
+  const d = [...data];
+  if (sort === 'spank_gap') d.sort((a,b) => b.spank_gap - a.spank_gap);
+  else if (sort === 'no_spank') d.sort((a,b) => b.no_spank - a.no_spank);
+  else d.sort((a,b) => a.country.localeCompare(b.country));
+  return d;
+}
+
+function buildTraces(data, view) {
+  const countries = data.map(d => d.country);
+  const traces = [];
+
+  // Spank connector lines
+  if (view !== 'explain') {
+    traces.push({
+      type: 'scatter', mode: 'lines',
+      x: data.flatMap(d => [d.no_spank * 100, d.spanked * 100, null]),
+      y: data.flatMap(d => [d.country, d.country, null]),
+      line: { color: 'rgba(154,51,36,0.18)', width: 3 },
+      showlegend: false, hoverinfo: 'skip'
+    });
+    // No-spank dots
+    traces.push({
+      type: 'scatter', mode: 'markers',
+      name: 'Not spanked',
+      x: data.map(d => d.no_spank * 100),
+      y: countries,
+      marker: { color: '#00B2A9', size: 11, line: { color: 'white', width: 2 } },
+      customdata: data,
+      hovertemplate: '<b>%{y}</b><br>Not spanked: %{x:.1f}%<extra></extra>'
+    });
+    // Spanked dots
+    traces.push({
+      type: 'scatter', mode: 'markers',
+      name: 'Spanked',
+      x: data.map(d => d.spanked * 100),
+      y: countries,
+      marker: { color: '#9A3324', size: 11, line: { color: 'white', width: 2 } },
+      customdata: data,
+      hovertemplate: '<b>%{y}</b><br>Spanked: %{x:.1f}%<br>Gap: +%{customdata.spank_gap:.1%}<extra></extra>'
+    });
+  }
+
+  // Explain connector lines
+  if (view !== 'spank') {
+    traces.push({
+      type: 'scatter', mode: 'lines',
+      x: data.flatMap(d => [d.no_explain * 100, d.explained * 100, null]),
+      y: data.flatMap(d => [d.country, d.country, null]),
+      line: { color: 'rgba(47,101,167,0.15)', width: 2, dash: 'dot' },
+      showlegend: false, hoverinfo: 'skip'
+    });
+    traces.push({
+      type: 'scatter', mode: 'markers',
+      name: 'Not explained',
+      x: data.map(d => d.no_explain * 100),
+      y: countries,
+      marker: { color: '#2F65A7', size: 8, symbol: 'diamond', line: { color: 'white', width: 1.5 } },
+      customdata: data,
+      hovertemplate: '<b>%{y}</b><br>Not explained: %{x:.1f}%<extra></extra>'
+    });
+    traces.push({
+      type: 'scatter', mode: 'markers',
+      name: 'Explained',
+      x: data.map(d => d.explained * 100),
+      y: countries,
+      marker: { color: '#D86018', size: 8, symbol: 'diamond', line: { color: 'white', width: 1.5 } },
+      customdata: data,
+      hovertemplate: '<b>%{y}</b><br>Explained: %{x:.1f}%<extra></extra>'
+    });
+  }
+
+  return traces;
+}
+
+function getLayout(data) {
+  const n = data.length;
+  const rowH = 22;
+  const chartH = Math.max(500, n * rowH + 80);
+  return {
+    height: chartH,
+    margin: { l: 170, r: 80, t: 20, b: 40 },
+    paper_bgcolor: '#F7F5F1',
+    plot_bgcolor:  '#F7F5F1',
+    font: { family: "'Source Sans 3', sans-serif", size: 11, color: '#655A52' },
+    xaxis: {
+      title: { text: 'Predicted probability of child aggression (%)', font: { size: 11, color: '#989C97', family: "'Source Code Pro', monospace" } },
+      range: [0, 75],
+      ticksuffix: '%',
+      gridcolor: '#E8E3DC',
+      gridwidth: 0.5,
+      zeroline: false,
+      tickfont: { family: "'Source Code Pro', monospace", size: 10 }
+    },
+    yaxis: {
+      automargin: true,
+      tickfont: { family: "'Source Sans 3', sans-serif", size: 11, color: '#00274C' },
+      fixedrange: true
+    },
+    showlegend: false,
+    hovermode: 'closest',
+    hoverlabel: {
+      bgcolor: '#00274C',
+      font: { color: 'white', family: "'Source Sans 3', sans-serif", size: 12 },
+      bordercolor: '#FFCB05'
+    },
+    dragmode: false,
+  };
+}
+
+function renderChart() {
+  const sorted = getSorted(DATA, currentSort);
+  const traces = buildTraces(sorted, currentView);
+  const layout = getLayout(sorted);
+  const config = {
+    responsive: true,
+    displayModeBar: false,
+    scrollZoom: false,
+    doubleClick: false,
+    staticPlot: false
+  };
+
+  Plotly.react('chart', traces, layout, config);
+
+  document.getElementById('chart').on('plotly_click', function(evt) {
+    if (!evt.points || !evt.points.length) return;
+    const pt = evt.points[0];
+    if (!pt.customdata) return;
+    showDetail(pt.customdata);
+  });
+}
+
+function showDetail(d) {
+  document.getElementById('detailCountry').textContent = d.country;
+
+  const sg = d.spank_gap;
+  const eg = d.explain_gap;
+
+  document.getElementById('detailCards').innerHTML = `
+    <div class="detail-card dc-no-spank">
+      <div class="dc-lbl teal">Not spanked</div>
+      <div class="dc-num">${pct(d.no_spank)}</div>
+      <div class="dc-sub">predicted aggression</div>
+    </div>
+    <div class="detail-card dc-spanked">
+      <div class="dc-lbl red">Spanked</div>
+      <div class="dc-num">${pct(d.spanked)}</div>
+      <div class="dc-sub">predicted aggression</div>
+      <div class="dc-gap ${sg >= 0 ? 'pos' : 'neg'}">${gap(sg)} gap</div>
+    </div>
+    <div class="detail-card dc-no-explain">
+      <div class="dc-lbl blue">Not explained</div>
+      <div class="dc-num">${pct(d.no_explain)}</div>
+      <div class="dc-sub">predicted aggression</div>
+    </div>
+    <div class="detail-card dc-explained">
+      <div class="dc-lbl orange">Explained</div>
+      <div class="dc-num">${pct(d.explained)}</div>
+      <div class="dc-sub">predicted aggression</div>
+      <div class="dc-gap ${eg >= 0 ? 'pos' : 'neg'}">${gap(eg)} gap</div>
+    </div>
+  `;
+
+  const spankDir = sg >= 0 ? `raises predicted aggression by <strong>${gap(sg)}</strong>` : `is associated with lower aggression by ${gap(eg)}`;
+  const explainDir = eg < 0
+    ? `Explaining why behavior is wrong <strong>reduces</strong> predicted aggression by <strong>${gap(Math.abs(eg))}</strong> — a protective effect.`
+    : eg === 0 ? `Explaining has no measurable effect on aggression in this country.`
+    : `Explaining also raises aggression slightly by <strong>${gap(eg)}</strong> in this country.`;
+
+  document.getElementById('detailInsight').innerHTML =
+    `In <strong>${d.country}</strong>, spanking ${spankDir}. ${explainDir}`;
+
+  const panel = document.getElementById('detailPanel');
+  panel.classList.add('visible');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function closeDetail() {
+  document.getElementById('detailPanel').classList.remove('visible');
+}
+
+function setView(view, el) {
+  currentView = view;
+  document.querySelectorAll('#viewChips .chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  const legEx = document.getElementById('leg-explain-items');
+  legEx.style.display = (view === 'spank') ? 'none' : 'flex';
+  renderChart();
+}
+
+function applyFilters() {
+  currentSort = document.getElementById('sortSelect').value;
+  renderChart();
+}
+
+renderChart();
+</script>
+</body>
+</html>
